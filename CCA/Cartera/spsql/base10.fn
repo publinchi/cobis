@@ -1,0 +1,114 @@
+use cob_cartera
+go
+
+IF OBJECT_ID ('dbo.fn_base10') IS NOT NULL
+	DROP FUNCTION dbo.fn_base10
+GO
+
+create function fn_base10(
+	@i_referencia   varchar(30)
+)
+returns int
+as
+begin
+   declare @w_num_generado       varchar(30),
+           @w_caracter           char(1),
+           @w_num_caracter       int,
+           @w_posicion           int,
+           @w_contador           int,
+           @w_acumulador         int,
+           @w_valor              int,
+           @w_valor_temp         int,
+           @w_factor             int,
+           @w_verificador        int 
+   
+   declare @TablaRefCaracteres as table 
+   (
+   	caracter   char(1) PRIMARY KEY CLUSTERED,
+   	valor      int 
+   )
+   
+   insert into @TablaRefCaracteres (caracter, valor) values ('0', 0)
+   insert into @TablaRefCaracteres (caracter, valor) values ('1', 1)
+   insert into @TablaRefCaracteres (caracter, valor) values ('2', 2)
+   insert into @TablaRefCaracteres (caracter, valor) values ('3', 3)
+   insert into @TablaRefCaracteres (caracter, valor) values ('4', 4)
+   insert into @TablaRefCaracteres (caracter, valor) values ('5', 5)
+   insert into @TablaRefCaracteres (caracter, valor) values ('6', 6)
+   insert into @TablaRefCaracteres (caracter, valor) values ('7', 7)
+   insert into @TablaRefCaracteres (caracter, valor) values ('8', 8)
+   insert into @TablaRefCaracteres (caracter, valor) values ('9', 9)
+   
+   insert into @TablaRefCaracteres (caracter, valor) values ('A', 1)
+   insert into @TablaRefCaracteres (caracter, valor) values ('B', 2)
+   insert into @TablaRefCaracteres (caracter, valor) values ('C', 3)
+   insert into @TablaRefCaracteres (caracter, valor) values ('D', 4)
+   insert into @TablaRefCaracteres (caracter, valor) values ('E', 5)
+   insert into @TablaRefCaracteres (caracter, valor) values ('F', 6)
+   insert into @TablaRefCaracteres (caracter, valor) values ('G', 7)
+   insert into @TablaRefCaracteres (caracter, valor) values ('H', 8)
+   insert into @TablaRefCaracteres (caracter, valor) values ('I', 9)
+   insert into @TablaRefCaracteres (caracter, valor) values ('J', 1)
+   insert into @TablaRefCaracteres (caracter, valor) values ('K', 2)
+   insert into @TablaRefCaracteres (caracter, valor) values ('L', 3)
+   insert into @TablaRefCaracteres (caracter, valor) values ('M', 4)
+   insert into @TablaRefCaracteres (caracter, valor) values ('N', 5)
+   insert into @TablaRefCaracteres (caracter, valor) values ('O', 6)
+   insert into @TablaRefCaracteres (caracter, valor) values ('P', 7)
+   insert into @TablaRefCaracteres (caracter, valor) values ('Q', 8)
+   insert into @TablaRefCaracteres (caracter, valor) values ('R', 9)
+   insert into @TablaRefCaracteres (caracter, valor) values ('S', 2)
+   insert into @TablaRefCaracteres (caracter, valor) values ('T', 3)
+   insert into @TablaRefCaracteres (caracter, valor) values ('U', 4)
+   insert into @TablaRefCaracteres (caracter, valor) values ('V', 5)
+   insert into @TablaRefCaracteres (caracter, valor) values ('W', 6)
+   insert into @TablaRefCaracteres (caracter, valor) values ('X', 7)
+   insert into @TablaRefCaracteres (caracter, valor) values ('Y', 8)
+   insert into @TablaRefCaracteres (caracter, valor) values ('Z', 9)
+   
+   
+   
+   select @w_num_generado = @i_referencia
+   
+   select @w_num_caracter = len(@w_num_generado)
+   select @w_posicion = 1, @w_acumulador = 0
+   
+   
+   	select @w_posicion = len(@w_num_generado), @w_contador = 1
+
+    while @w_posicion >= 1
+    begin
+       select @w_caracter = substring(@w_num_generado, @w_posicion, 1)
+       
+       select @w_valor_temp = isnull(valor, 0) from @TablaRefCaracteres where upper(caracter) = upper(@w_caracter)
+       
+       if (@w_contador % 2) > 0 begin
+       --CARACTER IMPAR
+          select @w_factor = 2
+       end
+       else begin
+          --CARACTER PAR
+          select @w_factor = 1
+       end
+    
+       select @w_valor = convert(int, @w_valor_temp) * @w_factor
+       
+       if (@w_valor >= 10) begin
+          select @w_valor = (@w_valor / 10) + (@w_valor - 10)
+       end
+    
+       select @w_acumulador = @w_acumulador + @w_valor
+       select @w_posicion = @w_posicion - 1, @w_contador = @w_contador + 1
+    end
+    
+    select @w_acumulador = @w_acumulador - (10 * convert(int, (@w_acumulador / 10)))
+    
+    if (@w_acumulador < 10 and @w_acumulador > 0) begin
+       select @w_verificador = 10 - substring(convert(varchar, @w_acumulador), len(@w_acumulador), 1)
+    end
+    else begin
+       select @w_verificador = 0 --@w_acumulador
+    end
+	return @w_verificador
+end
+go

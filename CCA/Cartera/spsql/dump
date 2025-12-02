@@ -1,0 +1,2 @@
+dump tran cob_cartera with truncate_only
+go
