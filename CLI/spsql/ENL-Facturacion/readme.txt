@@ -1,1 +1,0 @@
-En esta carpeta subir los sps correspondientes a facturación electrónica para Enlace
